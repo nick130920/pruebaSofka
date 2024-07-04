@@ -2,15 +2,16 @@ package com.sofka.pruebasofka.controller;
 
 import com.sofka.pruebasofka.model.Audit;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -21,15 +22,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Mono<String> login(@RequestParam String username) {
+    public Mono<ResponseEntity<Map<String, String>>> login(@RequestParam String username) {
         sendAuditEvent(username, "LOGIN");
-        return Mono.just("Login successful");
+        return Mono.just(ResponseEntity.ok().body(Map.of("message", "Login successful", "username", username)));
     }
 
     @PostMapping("/logout")
-    public Mono<String> logout(@RequestParam String username) {
+    public Mono<ResponseEntity<Object>> logout(@RequestParam String username) {
         sendAuditEvent(username, "LOGOUT");
-        return Mono.just("Logout successful");
+        return Mono.just(ResponseEntity.ok().build());
     }
 
     private void sendAuditEvent(String username, String action) {
